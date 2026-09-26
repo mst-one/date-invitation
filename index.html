@@ -315,7 +315,7 @@
 (() => {
   // GitHubに公開するHTMLには秘密のトークンを保存しません。
   // 招待URLの ?invite=... を読み取り、回答送信時にGASへ渡します。
-  const API_URL = "ここにGASのウェブアプリURLを入力";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzYWNafmabVaNa_VoZUufDfbT5RLaTKmnLT6OvJEsGsG_MAU_eYa2yMKrG1QA40Wmc/exec";
   const inviteToken = new URLSearchParams(window.location.search).get("invite");
 
   // 招待URLなしではサイト本体を表示しない。
