@@ -5,161 +5,645 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>デートのお誘い</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;background:linear-gradient(135deg,#fff7fb,#f5f7ff);color:#333}
-.screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.card{width:min(92vw,560px);background:#fff;border-radius:28px;padding:42px 24px;box-shadow:0 18px 50px rgba(60,60,90,.12);text-align:center}
-h1{font-size:clamp(27px,6vw,40px);margin:0 0 12px}
-p{color:#777;line-height:1.8}
-.button-area{position:relative;width:min(100%,390px);height:110px;margin:28px auto 0}
-button{border:0;border-radius:999px;padding:13px 30px;font-size:16px;font-weight:700;cursor:pointer}
-#yes{background:#ff6f9d;color:#fff;box-shadow:0 8px 18px rgba(255,111,157,.25)}
-#no{position:absolute;left:235px;top:0;background:#eee;color:#555;transition:.16s;white-space:nowrap}
-.hint{height:22px;margin-top:12px;color:#aaa;font-size:13px}
-.hide{display:none!important}
-.calendar-wrap,.time-section{width:min(100%,400px);margin:20px auto;padding:15px;background:#fafafa;border-radius:18px}
-.calendar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.month-btn{width:38px;height:38px;padding:0;background:#fff;border:1px solid #eee;color:#555;font-size:25px}
-.weekdays,.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-.weekdays{font-size:12px;color:#999;margin-bottom:5px}
-.weekdays span{padding:4px 0}
-.day{aspect-ratio:1;padding:0;border-radius:10px;background:#fff;border:1px solid #eee;color:#444;font-size:13px}
-.day.empty{visibility:hidden}
-.day:disabled{color:#ccc;background:#f5f5f5}
-.day.selected,.time-option.selected{background:#ff6f9d;color:#fff;border-color:#ff6f9d}
-.time-title{font-size:14px;font-weight:700;color:#555;margin-bottom:10px}
-.time-options{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.time-option{padding:9px 4px;background:#fff;color:#555;border:1px solid #eee;border-radius:10px;font-size:13px}
-.selected-date,.selected-time{min-height:22px;margin:10px 0;font-size:13px;color:#777;font-weight:600}
-.confirm{background:#ff6f9d;color:#fff;width:min(100%,300px);margin:8px auto}
-.confirm:disabled{background:#ddd;color:#999;cursor:not-allowed}
-.back{background:#333;color:#fff;margin-top:8px}
-.heart{font-size:58px}
-.error{color:#c44}
-@media(max-width:600px){#no{} .time-options{grid-template-columns:repeat(3,1fr)} #yes{position:absolute;left:50%;transform:translateX(-50%);top:0} #no{left:50%;top:70px;transform:translateX(-50%)}}
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; min-height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
+                 "Yu Gothic", "Meiryo", sans-serif;
+    background: linear-gradient(135deg, #fff7fb, #f5f7ff);
+    color: #333;
+    overflow: hidden;
+  }
+  .screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    width: min(92vw, 560px);
+    min-height: 330px;
+    background: rgba(255,255,255,.94);
+    border-radius: 28px;
+    padding: 48px 28px;
+    text-align: center;
+    box-shadow: 0 18px 50px rgba(60,60,90,.12);
+  }
+  h1 {
+    margin: 0 0 14px;
+    font-size: clamp(27px, 6vw, 40px);
+    letter-spacing: .04em;
+  }
+  .message {
+    margin: 0 0 38px;
+    color: #777;
+    font-size: 15px;
+  }
+  .button-area {
+    position: relative;
+    width: min(100%, 390px);
+    height: 100px;
+    margin: 0 auto;
+  }
+  button {
+    border: 0;
+    border-radius: 999px;
+    padding: 15px 38px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #yes {
+    background: #ff6f9d;
+    color: white;
+    box-shadow: 0 8px 18px rgba(255,111,157,.25);
+  }
+  #no {
+    position: absolute;
+    left: 235px;
+    top: 0;
+    background: #eee;
+    color: #555;
+    transition: left .16s ease, top .16s ease, transform .16s ease;
+    white-space: nowrap;
+  }
+  .hint {
+    margin-top: 28px;
+    min-height: 22px;
+    font-size: 13px;
+    color: #aaa;
+  }
+  .result { display: none; }
+  .result.show { display: block; }
+  .question.hide { display: none; }
+  .heart {
+    font-size: 58px;
+    margin-bottom: 10px;
+  }
+  .result h2 {
+    margin: 0 0 12px;
+    font-size: 31px;
+  }
+  .result p {
+    color: #666;
+    line-height: 1.8;
+    margin: 0 0 28px;
+  }
+  .back {
+    background: #333;
+    color: white;
+    padding: 12px 28px;
+  }
+
+  .calendar-wrap {
+    width: min(100%, 390px);
+    margin: 24px auto 16px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 18px;
+  }
+  .calendar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .month-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    background: white;
+    color: #555;
+    border: 1px solid #eee;
+    font-size: 25px;
+    line-height: 1;
+  }
+  .weekdays, .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+  .weekdays {
+    margin-bottom: 5px;
+    color: #999;
+    font-size: 12px;
+  }
+  .weekdays span {
+    text-align: center;
+    padding: 5px 0;
+  }
+  .day {
+    aspect-ratio: 1;
+    padding: 0;
+    border-radius: 10px;
+    background: white;
+    color: #444;
+    border: 1px solid #eee;
+    font-size: 14px;
+  }
+  .day:hover:not(:disabled) {
+    border-color: #ff6f9d;
+  }
+  .day.empty {
+    visibility: hidden;
+  }
+  .day:disabled {
+    color: #ccc;
+    background: #f5f5f5;
+    cursor: default;
+  }
+  .day.selected {
+    background: #ff6f9d;
+    color: white;
+    border-color: #ff6f9d;
+  }
+  .selected-date {
+    min-height: 24px;
+    margin: 10px 0 14px;
+    color: #555;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .confirm {
+    background: #ff6f9d;
+    color: white;
+    margin-bottom: 10px;
+    width: min(100%, 260px);
+  }
+  .confirm:disabled {
+    background: #ddd;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .result .back {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .time-section {
+    width: min(100%, 390px);
+    margin: 12px auto 16px;
+    padding: 14px 16px;
+    background: #fafafa;
+    border-radius: 18px;
+  }
+  .time-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #555;
+  }
+  .time-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+  }
+  .time-option {
+    padding: 9px 4px;
+    background: white;
+    color: #555;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .time-option.selected {
+    background: #ff6f9d;
+    color: white;
+    border-color: #ff6f9d;
+  }
+  .time-option.all-day {
+    grid-column: 1 / -1;
+    font-weight: 700;
+  }
+  .selected-time {
+    min-height: 20px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #888;
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 40px 20px; }
+    .button-area { height: 145px; }
+    #yes { position: absolute; left: 50%; transform: translateX(-50%); top: 0; }
+    #no { left: 50%; top: 75px; transform: translateX(-50%); }
+  }
 </style>
 </head>
 <body>
-<div class="screen"><main class="card">
-<section id="question">
-<h1>デートに行きませんか？</h1>
-<p>あなたの答えを選んでください。</p>
-<div class="button-area"><button id="yes">YES</button><button id="no">NO</button></div>
-<div id="hint" class="hint">NOを選ぶこともできます。</div>
-</section>
+<div class="screen">
+  <main class="card">
 
-<section id="schedule" class="hide">
-<div class="heart">♡</div>
-<h2>ありがとうございます！</h2>
-<p>それでは、デートに行きましょう！<br>都合のいい日と時間を選んでください。</p>
-<div class="calendar-wrap">
-<div class="calendar-head"><button class="month-btn" id="prev">‹</button><strong id="month"></strong><button class="month-btn" id="next">›</button></div>
-<div class="weekdays"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div>
-<div id="calendar" class="calendar"></div>
+    <section id="question" class="question">
+      <h1>デートに行きませんか？</h1>
+      <p class="message">あなたの答えを選んでください。</p>
+
+      <div id="buttonArea" class="button-area">
+        <button id="yes" type="button">YES</button>
+        <button id="no" type="button">NO</button>
+      </div>
+
+      <div id="hint" class="hint">NOを選ぶこともできます。</div>
+    </section>
+
+    <section id="result" class="result">
+      <div class="heart">♡</div>
+      <h2>ありがとうございます！</h2>
+      <p>それでは、デートに行きましょう！<br>都合のいい日を選んでください。</p>
+
+      <div class="calendar-wrap">
+        <div class="calendar-head">
+          <button class="month-btn" id="prevMonth" type="button">‹</button>
+          <strong id="monthTitle"></strong>
+          <button class="month-btn" id="nextMonth" type="button">›</button>
+        </div>
+        <div class="weekdays">
+          <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+        </div>
+        <div id="calendar" class="calendar"></div>
+      </div>
+
+      <div id="selectedDate" class="selected-date">行ける日を複数選択できます</div>
+
+      <div class="time-section">
+        <div class="time-title">時間帯も選んでください（6:00〜24:00）</div>
+        <div id="timeOptions" class="time-options">
+          <button type="button" class="time-option all-day" data-time="終日">終日（1日空いている）</button>
+          <button type="button" class="time-option" data-time="06:00">6:00</button>
+          <button type="button" class="time-option" data-time="07:00">7:00</button>
+          <button type="button" class="time-option" data-time="08:00">8:00</button>
+          <button type="button" class="time-option" data-time="09:00">9:00</button>
+          <button type="button" class="time-option" data-time="10:00">10:00</button>
+          <button type="button" class="time-option" data-time="11:00">11:00</button>
+          <button type="button" class="time-option" data-time="12:00">12:00</button>
+          <button type="button" class="time-option" data-time="13:00">13:00</button>
+          <button type="button" class="time-option" data-time="14:00">14:00</button>
+          <button type="button" class="time-option" data-time="15:00">15:00</button>
+          <button type="button" class="time-option" data-time="16:00">16:00</button>
+          <button type="button" class="time-option" data-time="17:00">17:00</button>
+          <button type="button" class="time-option" data-time="18:00">18:00</button>
+          <button type="button" class="time-option" data-time="19:00">19:00</button>
+          <button type="button" class="time-option" data-time="20:00">20:00</button>
+          <button type="button" class="time-option" data-time="21:00">21:00</button>
+          <button type="button" class="time-option" data-time="22:00">22:00</button>
+          <button type="button" class="time-option" data-time="23:00">23:00</button>
+          <button type="button" class="time-option" data-time="24:00">24:00</button>
+        </div>
+        <div id="selectedTime" class="selected-time">時間を選択してください</div>
+      </div>
+
+      <button id="confirmDate" class="confirm" type="button" disabled>選択した日程で申請する</button>
+      <button class="back" id="back" type="button">最初に戻る</button>
+    </section>
+
+    <section id="complete" class="result">
+      <div class="heart">♡</div>
+      <h2>デート申請完了！</h2>
+      <p id="completeMessage"></p>
+      <button class="back" id="restart" type="button">もう一度見る</button>
+    </section>
+
+  </main>
 </div>
-<div id="selectedDate" class="selected-date">行ける日を複数選択できます</div>
-<div class="time-section">
-<div class="time-title">行ける時間も選んでください</div>
-<div id="times" class="time-options"></div>
-<div id="selectedTime" class="selected-time">時間を選択してください</div>
-</div>
-<button id="submit" class="confirm" disabled>選択した日程で申請する</button>
-</section>
-
-<section id="done" class="hide">
-<div class="heart">♡</div><h2>デート申請完了！</h2>
-<p id="doneText"></p>
-<p>選択した日程を送信しました。</p>
-</section>
-
-<section id="invalid" class="hide">
-<h2>このリンクは利用できません</h2>
-<p class="error">招待リンクが正しくないか、無効になっています。</p>
-</section>
-</main></div>
 
 <script>
-const TOKEN="JZRDV1JDNV3gCl7FqTF24BfVA1LZtQ7D";
-const API_URL="ここにGASのウェブアプリURLを入力";
-const times=["10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
-const $=id=>document.getElementById(id);
-let chosenDates=[],chosenTimes=[],view=new Date(); view.setDate(1);
+(() => {
+  // GitHubに公開するHTMLには秘密のトークンを保存しません。
+  // 招待URLの ?invite=... を読み取り、回答送信時にGASへ渡します。
+  const API_URL = "ここにGASのウェブアプリURLを入力";
+  const inviteToken = new URLSearchParams(window.location.search).get("invite");
 
-function moveNo(){
-  const a=$("no"), area=a.parentElement, r=area.getBoundingClientRect(), n=a.getBoundingClientRect();
-  const maxX=Math.max(0,r.width-n.width),maxY=Math.max(0,r.height-n.height);
-  a.style.left=(Math.random()*maxX)+"px"; a.style.top=(Math.random()*maxY)+"px"; a.style.transform="none";
-  $("hint").textContent=["あれ？NOが逃げました。","もう一度どうぞ。","NOは選ばれたくないみたいです。","……YESもありますよ？","そろそろ諦めませんか？"][Math.min(4,chosenDates.length)];
-}
-$("no").addEventListener("mouseenter",moveNo);
-$("no").addEventListener("touchstart",e=>{e.preventDefault();moveNo()},{passive:false});
-$("no").addEventListener("click",e=>{e.preventDefault();moveNo()});
+  // 招待URLなしではサイト本体を表示しない。
+  if (!inviteToken) {
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Yu Gothic','Meiryo',sans-serif;background:linear-gradient(135deg,#fff7fb,#f5f7ff);">
+        <div style="background:#fff;padding:40px 28px;border-radius:24px;box-shadow:0 18px 50px rgba(60,60,90,.12);max-width:520px;">
+          <h1 style="margin:0 0 16px;font-size:28px;">招待URLが必要です</h1>
+          <p style="margin:0;color:#777;line-height:1.8;">このページは招待された方専用です。<br>送られてきたURLからアクセスしてください。</p>
+        </div>
+      </div>`;
+    return;
+  }
 
-function renderTimes(){
-  $("times").innerHTML="";
-  times.forEach(t=>{
-    const b=document.createElement("button"); b.className="time-option"; b.textContent=t;
-    b.onclick=()=>{
-      const i=chosenTimes.indexOf(t);
-      if(i>=0){chosenTimes.splice(i,1);b.classList.remove("selected")}
-      else{chosenTimes.push(t);chosenTimes.sort();b.classList.add("selected")}
-      $("selectedTime").textContent=chosenTimes.length?"選択中："+chosenTimes.join("、"):"時間を選択してください";
-      updateSubmit();
-    };
-    $("times").appendChild(b);
+  const no = document.getElementById("no");
+  const yes = document.getElementById("yes");
+  const area = document.getElementById("buttonArea");
+  const hint = document.getElementById("hint");
+  const question = document.getElementById("question");
+  const result = document.getElementById("result");
+  const complete = document.getElementById("complete");
+  const back = document.getElementById("back");
+  const restart = document.getElementById("restart");
+
+  const calendar = document.getElementById("calendar");
+  const monthTitle = document.getElementById("monthTitle");
+  const prevMonth = document.getElementById("prevMonth");
+  const nextMonth = document.getElementById("nextMonth");
+  const selectedDate = document.getElementById("selectedDate");
+  const confirmDate = document.getElementById("confirmDate");
+  const completeMessage = document.getElementById("completeMessage");
+
+  let attempts = 0;
+  let viewDate = new Date();
+  viewDate.setDate(1);
+  let chosenDates = [];
+  let chosenTimes = [];
+
+    const noMessages = [
+    "えっ、そっちは選べませんよ？",
+    "NOはちょっと待ってください！",
+    "そのボタン、本当に押します？",
+    "逃げちゃいました。",
+    "残念、NOは受付していません。",
+    "そっちはダメみたいです（笑）",
+    "デートのお誘い、もう一度考えてみませんか？",
+    "NOボタンが恥ずかしがっています。",
+    "そんなに逃げなくても大丈夫ですよ。",
+    "その選択肢は、ただいま逃走中です。",
+    "もしかして照れてます？",
+    "NOを押そうとしましたね？",
+    "まだYESを押すチャンスがあります。",
+    "ここはひとつ、YESでお願いします。",
+    "NOボタン、捕まえられませんでした。",
+    "逃げるは恥だが、デートは楽しいかもしれません。",
+    "その気持ち、いったん置いておきましょう。",
+    "もう一回だけ考えてみてください。",
+    "NOが逃げるほど、YESを待っています。",
+    "……本当にNOですか？"
+];
+
+  function moveNo() {
+    attempts++;
+    const areaRect = area.getBoundingClientRect();
+    const noRect = no.getBoundingClientRect();
+    const maxX = Math.max(0, areaRect.width - noRect.width);
+    const maxY = Math.max(0, areaRect.height - noRect.height);
+
+    let x = Math.random() * maxX;
+    let y = Math.random() * maxY;
+
+    for (let i = 0; i < 30; i++) {
+      x = Math.random() * maxX;
+      y = Math.random() * maxY;
+      const yesRect = yes.getBoundingClientRect();
+      const candidate = {
+        left: areaRect.left + x,
+        right: areaRect.left + x + noRect.width,
+        top: areaRect.top + y,
+        bottom: areaRect.top + y + noRect.height
+      };
+      const gap = 18;
+      const overlaps =
+        candidate.left < yesRect.right + gap &&
+        candidate.right > yesRect.left - gap &&
+        candidate.top < yesRect.bottom + gap &&
+        candidate.bottom > yesRect.top - gap;
+      if (!overlaps) break;
+    }
+
+    no.style.left = x + "px";
+    no.style.top = y + "px";
+    no.style.transform = "none";
+
+
+    hint.textContent = noMessages[Math.floor(Math.random() * noMessages.length)];
+  }
+
+  no.addEventListener("mouseenter", moveNo);
+  no.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNo();
+  }, { passive: false });
+  no.addEventListener("click", (e) => {
+    e.preventDefault();
+    moveNo();
   });
-}
-function updateSubmit(){ $("submit").disabled=!(chosenDates.length&&chosenTimes.length) }
 
-function renderCalendar(){
-  const y=view.getFullYear(),m=view.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
-  $("month").textContent=y+"年"+(m+1)+"月"; $("calendar").innerHTML="";
-  for(let i=0;i<first;i++){let b=document.createElement("button");b.className="day empty";b.disabled=true;$("calendar").appendChild(b)}
-  const today=new Date(); today.setHours(0,0,0,0);
-  for(let d=1;d<=days;d++){
-    const dt=new Date(y,m,d);dt.setHours(0,0,0,0);
-    const b=document.createElement("button");b.className="day";b.textContent=d;
-    const key=y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
-    if(dt<today)b.disabled=true;
-    else b.onclick=()=>{
-      const i=chosenDates.indexOf(key);
-      if(i>=0){chosenDates.splice(i,1);b.classList.remove("selected")}
-      else{chosenDates.push(key);b.classList.add("selected")}
-      chosenDates.sort();
-      $("selectedDate").textContent=chosenDates.length?"選択中："+chosenDates.map(x=>{const p=x.split("-");return p[1]+"/"+p[2]}).join("、"):"行ける日を複数選択できます";
-      updateSubmit();
+  function showCalendar() {
+    question.classList.add("hide");
+    complete.classList.remove("show");
+    result.classList.add("show");
+    chosenDates = [];
+    chosenTimes = [];
+    selectedDate.textContent = "行ける日を複数選択できます";
+    document.getElementById("selectedTime").textContent = "時間を選択してください";
+    document.querySelectorAll(".time-option.selected").forEach(el => el.classList.remove("selected"));
+    confirmDate.disabled = true;
+    renderCalendar();
+  }
+
+  yes.addEventListener("click", showCalendar);
+
+  document.querySelectorAll(".time-option").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const time = btn.dataset.time;
+      const index = chosenTimes.indexOf(time);
+
+      if (time === "終日") {
+        // 「終日」を選んだら、個別の時間は解除
+        if (index >= 0) {
+          chosenTimes.splice(index, 1);
+          btn.classList.remove("selected");
+        } else {
+          chosenTimes = ["終日"];
+          document.querySelectorAll(".time-option").forEach(el => {
+            el.classList.toggle("selected", el.dataset.time === "終日");
+          });
+        }
+      } else {
+        // 個別の時間を選んだら「終日」は解除
+        const allDayBtn = document.querySelector('.time-option[data-time="終日"]');
+        const allDayIndex = chosenTimes.indexOf("終日");
+        if (allDayIndex >= 0) {
+          chosenTimes.splice(allDayIndex, 1);
+          allDayBtn.classList.remove("selected");
+        }
+
+        if (index >= 0) {
+          chosenTimes.splice(index, 1);
+          btn.classList.remove("selected");
+        } else {
+          chosenTimes.push(time);
+          chosenTimes.sort();
+          btn.classList.add("selected");
+        }
+      }
+
+      document.getElementById("selectedTime").textContent =
+        chosenTimes.length
+          ? `選択中：${chosenTimes.join("、")}`
+          : "時間を選択してください";
+
+      confirmDate.disabled = !(chosenDates.length > 0 && chosenTimes.length > 0);
+    });
+  });
+
+  function renderCalendar() {
+    calendar.innerHTML = "";
+
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    monthTitle.textContent = `${year}年${month + 1}月`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("button");
+      empty.className = "day empty";
+      empty.disabled = true;
+      calendar.appendChild(empty);
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "day";
+      btn.textContent = day;
+
+      const date = new Date(year, month, day);
+      date.setHours(0, 0, 0, 0);
+
+      // 今日より前の日付は選択不可
+      if (date < today) {
+        btn.disabled = true;
+      } else {
+        btn.addEventListener("click", () => {
+          const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+          const index = chosenDates.findIndex(item => item.key === key);
+
+          if (index >= 0) {
+            // もう一度押すと選択解除
+            chosenDates.splice(index, 1);
+            btn.classList.remove("selected");
+          } else {
+            // 複数選択
+            chosenDates.push({ date, key });
+            btn.classList.add("selected");
+          }
+
+          chosenDates.sort((a, b) => a.date - b.date);
+
+          const week = ["日", "月", "火", "水", "木", "金", "土"];
+
+          if (chosenDates.length === 0) {
+            selectedDate.textContent = "行ける日を複数選択できます";
+            confirmDate.disabled = true;
+          } else {
+            const labels = chosenDates.map(item => {
+              const dt = item.date;
+              return `${dt.getMonth() + 1}/${dt.getDate()}（${week[dt.getDay()]}）`;
+            });
+
+            selectedDate.textContent = `選択中：${labels.join("、")}`;
+            confirmDate.disabled = !(chosenDates.length > 0 && chosenTimes.length > 0);
+          }
+        });
+      }
+
+      calendar.appendChild(btn);
+    }
+
+    // 今月より前には戻れない
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+    prevMonth.disabled = viewDate <= currentMonth;
+  }
+
+  prevMonth.addEventListener("click", () => {
+    const currentMonth = new Date();
+    currentMonth.setDate(1);
+    currentMonth.setHours(0, 0, 0, 0);
+
+    if (viewDate > currentMonth) {
+      viewDate.setMonth(viewDate.getMonth() - 1);
+      renderCalendar();
+    }
+  });
+
+  nextMonth.addEventListener("click", () => {
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    renderCalendar();
+  });
+
+  confirmDate.addEventListener("click", async () => {
+    if (chosenDates.length === 0 || chosenTimes.length === 0) return;
+
+    const week = ["日", "月", "火", "水", "木", "金", "土"];
+
+    const labels = chosenDates.map(item => {
+      const dt = item.date;
+      return `${dt.getFullYear()}年${dt.getMonth() + 1}月${dt.getDate()}日（${week[dt.getDay()]}）`;
+    });
+
+    const payload = {
+      token: inviteToken,
+      dates: chosenDates.map(item => item.key),
+      times: [...chosenTimes]
     };
-    if(chosenDates.includes(key))b.classList.add("selected");
-    $("calendar").appendChild(b);
+
+    if (API_URL === "ここにGASのウェブアプリURLを入力") {
+      completeMessage.innerHTML =
+        `${labels.join("<br>")}<br><br>希望時間：${chosenTimes.join("、")}<br><br><span style="color:#b26a00;">※現在は確認用です。GAS設定後に回答が保存されます。</span>`;
+      result.classList.remove("show");
+      complete.classList.add("show");
+      return;
+    }
+
+    confirmDate.disabled = true;
+    const originalText = confirmDate.textContent;
+    confirmDate.textContent = "送信中…";
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (!data.ok) throw new Error(data.error || "送信に失敗しました");
+
+      completeMessage.innerHTML =
+        `${labels.join("<br>")}<br><br>希望時間：${chosenTimes.join("、")}<br><br>上記の日程・時間でデートを申請しました！`;
+      result.classList.remove("show");
+      complete.classList.add("show");
+    } catch (error) {
+      alert("送信できませんでした。少し時間をおいて、もう一度お試しください。");
+      confirmDate.disabled = false;
+      confirmDate.textContent = originalText;
+    }
+  });
+
+  function reset() {
+    attempts = 0;
+    no.style.left = "";
+    no.style.top = "";
+    no.style.transform = "";
+    hint.textContent = "NOを選ぶこともできます。";
+    chosenDates = [];
+    chosenTimes = [];
+    document.querySelectorAll(".time-option.selected").forEach(el => el.classList.remove("selected"));
+    document.getElementById("selectedTime").textContent = "時間を選択してください";
+    viewDate = new Date();
+    viewDate.setDate(1);
+    question.classList.remove("hide");
+    result.classList.remove("show");
+    complete.classList.remove("show");
   }
-}
-$("prev").onclick=()=>{const now=new Date();now.setDate(1);if(view>now){view.setMonth(view.getMonth()-1);renderCalendar()}};
-$("next").onclick=()=>{view.setMonth(view.getMonth()+1);renderCalendar()};
 
-$("yes").onclick=()=>{ $("question").classList.add("hide");$("schedule").classList.remove("hide");renderTimes();renderCalendar()};
-
-$("submit").onclick=async()=>{
-  $("submit").disabled=true;$("submit").textContent="送信中…";
-  try{
-    const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({token:TOKEN,dates:chosenDates,times:chosenTimes})});
-    const data=await res.json();
-    if(!data.ok)throw new Error(data.error||"送信できませんでした");
-    $("schedule").classList.add("hide");$("done").classList.remove("hide");
-    $("doneText").innerHTML="希望日：<br>"+chosenDates.join("<br>")+"<br><br>希望時間：<br>"+chosenTimes.join("、");
-  }catch(e){
-    alert("送信に失敗しました。\\n"+e.message);
-    $("submit").disabled=false;$("submit").textContent="選択した日程で申請する";
-  }
-};
-
-async function checkToken(){
-  if(API_URL.startsWith("ここに")) return;
-  try{
-    const r=await fetch(API_URL+"?token="+encodeURIComponent(TOKEN));
-    const d=await r.json();
-    if(!d.valid){$("question").classList.add("hide");$("invalid").classList.remove("hide")}
-  }catch(e){}
-}
-checkToken();
+  back.addEventListener("click", reset);
+  restart.addEventListener("click", reset);
+})();
 </script>
-</body></html>
+</body>
+</html>
